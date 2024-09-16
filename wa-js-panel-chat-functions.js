@@ -69,8 +69,66 @@ const ChatFunctions = {
     },
 
     sendMessage: async function() {
-        // Implementation of sendMessage function
-        // (The existing sendMessage function code goes here)
+        const recipients = document.getElementById('recipientIds').value.split('\n').filter(id => id.trim());
+        const message = document.getElementById('messageContent').value;
+        const attachmentInput = document.getElementById('attachmentInput');
+        const attachmentType = document.querySelector('input[name="attachmentType"]:checked').value;
+        const minDelay = parseInt(document.getElementById('minDelay').value);
+        const maxDelay = parseInt(document.getElementById('maxDelay').value);
+
+        let isCancelled = false;
+        document.getElementById('cancelSend').style.display = 'inline-block';
+        document.getElementById('cancelSend').onclick = () => {
+            isCancelled = true;
+        };
+
+        for (let i = 0; i < recipients.length; i++) {
+            if (isCancelled) {
+                console.log('Message sending cancelled');
+                break;
+            }
+
+            const recipient = recipients[i].trim();
+            if (recipient) {
+                try {
+                    const chatId = await getChatId(recipient);
+                    if (attachmentInput.files.length > 0) {
+                        const file = attachmentInput.files[0];
+                        switch (attachmentType) {
+                            case 'image':
+                                await WPP.chat.sendFileMessage(chatId, file, { type: 'image' });
+                                break;
+                            case 'video':
+                                await WPP.chat.sendFileMessage(chatId, file, { type: 'video' });
+                                break;
+                            case 'audio':
+                                await WPP.chat.sendFileMessage(chatId, file, { type: 'audio' });
+                                break;
+                            case 'file':
+                                await WPP.chat.sendFileMessage(chatId, file);
+                                break;
+                            case 'contact':
+                                // Assuming the file contains vCard data
+                                const vcard = await file.text();
+                                await WPP.chat.sendVCardMessage(chatId, vcard);
+                                break;
+                        }
+                    }
+                    
+                    if (message) {
+                        await WPP.chat.sendTextMessage(chatId, message);
+                    }
+
+                    updateSendProgress(i + 1, recipients.length);
+                    await delay(randomBetween(minDelay, maxDelay) * 1000);
+                } catch (error) {
+                    console.error(`Failed to send message to ${recipient}:`, error);
+                }
+            }
+        }
+
+        document.getElementById('cancelSend').style.display = 'none';
+        alert('Message sending completed');
     },
 
     cancelSend: function() {
