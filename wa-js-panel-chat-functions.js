@@ -1,6 +1,7 @@
 // Chat Functions module
 const ChatFunctions = {
     init: function() {
+        this.addStyles();
         const htmlContent = `
             <h4>聊天功能</h4>
             <textarea id="recipientIds" placeholder="输入接收者ID/手机号码 (每行一个)" style="width: 100%; height: 60px; margin-bottom: 5px;"></textarea>
@@ -25,6 +26,38 @@ const ChatFunctions = {
         `;
         WA_JS_Panel.addFunctionToPanel('chat', htmlContent);
         this.bindEvents();
+    },
+
+    addStyles: function() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .chat-textarea {
+                width: 100%;
+                height: 60px;
+                margin-bottom: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 5px;
+            }
+            .attachment-section {
+                margin-bottom: 10px;
+            }
+            .delay-section {
+                margin-bottom: 10px;
+            }
+            .delay-input {
+                width: 50px;
+                margin: 0 5px;
+            }
+            .send-progress {
+                height: 5px;
+                background-color: #25d366;
+                width: 0;
+                transition: width 0.3s;
+                margin-top: 10px;
+            }
+        `;
+        document.head.appendChild(style);
     },
 
     bindEvents: function() {
