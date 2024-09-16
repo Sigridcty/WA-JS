@@ -207,9 +207,9 @@ const ChatFunctions = {
 
     createVCard: function(contactId, contactName) {
         return `BEGIN:VCARD
-VERSION:3.0
-FN:${contactName}
-TEL;TYPE=CELL:${contactId}
-END:VCARD`;
+            VERSION:3.0
+            FN:${contactName}
+            TEL;TYPE=CELL:${contactId}
+            END:VCARD`;
     }
 };
