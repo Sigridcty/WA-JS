@@ -4,24 +4,28 @@ const ChatFunctions = {
         this.addStyles();
         const htmlContent = `
             <h4>聊天功能</h4>
-            <textarea id="recipientIds" placeholder="输入接收者ID/手机号码 (每行一个)" style="width: 100%; height: 60px; margin-bottom: 5px;"></textarea>
-            <textarea id="messageContent" placeholder="输入消息内容" style="width: 100%; height: 60px; margin-bottom: 5px;"></textarea>
-            <div>
+            <textarea id="recipientIds" placeholder="输入接收者ID/手机号码 (每行一个)" class="chat-textarea"></textarea>
+            <textarea id="messageContent" placeholder="输入消息内容" class="chat-textarea"></textarea>
+            <div class="attachment-section">
                 <input type="file" id="attachmentInput" multiple>
                 <div id="attachmentType">
-                    <input type="radio" name="attachmentType" value="image" checked> 图片
-                    <input type="radio" name="attachmentType" value="video"> 视频
-                    <input type="radio" name="attachmentType" value="audio"> 音频
-                    <input type="radio" name="attachmentType" value="file"> 文件
-                    <input type="radio" name="attachmentType" value="contact"> 联系人名片
+                    <label><input type="radio" name="attachmentType" value="image" checked> 图片</label>
+                    <label><input type="radio" name="attachmentType" value="video"> 视频</label>
+                    <label><input type="radio" name="attachmentType" value="audio"> 音频</label>
+                    <label><input type="radio" name="attachmentType" value="file"> 文件</label>
+                    <label><input type="radio" name="attachmentType" value="contact"> 联系人名片</label>
                 </div>
             </div>
-            <div>
-                延迟发送: <input type="number" id="minDelay" value="1" style="width: 50px;"> - 
-                <input type="number" id="maxDelay" value="3" style="width: 50px;"> 秒
+            <div id="contactCardInputs" style="display: none;">
+                <input type="text" id="contactId" placeholder="联系人ID" class="contact-input">
+                <input type="text" id="contactName" placeholder="联系人名字" class="contact-input">
+            </div>
+            <div class="delay-section">
+                延迟发送: <input type="number" id="minDelay" value="1" class="delay-input"> - 
+                <input type="number" id="maxDelay" value="3" class="delay-input"> 秒
             </div>
             <button id="sendMessage">发送消息</button>
-            <div id="sendProgress" style="margin-top: 10px;"></div>
+            <div id="sendProgress" class="send-progress"></div>
             <button id="cancelSend" style="display:none;">取消发送</button>
         `;
         WA_JS_Panel.addFunctionToPanel('chat', htmlContent);
@@ -56,16 +60,33 @@ const ChatFunctions = {
                 transition: width 0.3s;
                 margin-top: 10px;
             }
+            .contact-input {
+                width: calc(50% - 5px);
+                margin-bottom: 10px;
+                padding: 5px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
         `;
         document.head.appendChild(style);
     },
 
     bindEvents: function() {
-        document.getElementById('sendMessage').addEventListener('click', this.sendMessage);
-        document.getElementById('cancelSend').addEventListener('click', this.cancelSend);
-        document.getElementById('recipientIds').addEventListener('paste', this.handleClipboardPaste);
-        document.getElementById('messageContent').addEventListener('paste', this.handleClipboardPaste);
-        document.getElementById('attachmentInput').addEventListener('paste', this.handleImagePaste);
+        document.getElementById('sendMessage').addEventListener('click', () => this.sendMessage());
+        document.getElementById('cancelSend').addEventListener('click', () => this.cancelSend());
+        document.getElementById('recipientIds').addEventListener('paste', (e) => this.handleClipboardPaste(e));
+        document.getElementById('messageContent').addEventListener('paste', (e) => this.handleClipboardPaste(e));
+        document.getElementById('attachmentInput').addEventListener('paste', (e) => this.handleImagePaste(e));
+        
+        // Add event listener for attachment type change
+        document.querySelectorAll('input[name="attachmentType"]').forEach(radio => {
+            radio.addEventListener('change', (e) => this.toggleContactCardInputs(e));
+        });
+    },
+
+    toggleContactCardInputs: function(e) {
+        const contactCardInputs = document.getElementById('contactCardInputs');
+        contactCardInputs.style.display = e.target.value === 'contact' ? 'block' : 'none';
     },
 
     sendMessage: async function() {
@@ -91,8 +112,15 @@ const ChatFunctions = {
             const recipient = recipients[i].trim();
             if (recipient) {
                 try {
-                    const chatId = await getChatId(recipient);
-                    if (attachmentInput.files.length > 0) {
+                    const chatId = await this.getChatId(recipient);
+                    if (attachmentType === 'contact') {
+                        const contactId = document.getElementById('contactId').value;
+                        const contactName = document.getElementById('contactName').value;
+                        if (contactId && contactName) {
+                            const vcard = this.createVCard(contactId, contactName);
+                            await WPP.chat.sendVCardMessage(chatId, vcard);
+                        }
+                    } else if (attachmentInput.files.length > 0) {
                         const file = attachmentInput.files[0];
                         switch (attachmentType) {
                             case 'image':
@@ -107,11 +135,6 @@ const ChatFunctions = {
                             case 'file':
                                 await WPP.chat.sendFileMessage(chatId, file);
                                 break;
-                            case 'contact':
-                                // Assuming the file contains vCard data
-                                const vcard = await file.text();
-                                await WPP.chat.sendVCardMessage(chatId, vcard);
-                                break;
                         }
                     }
                     
@@ -119,8 +142,8 @@ const ChatFunctions = {
                         await WPP.chat.sendTextMessage(chatId, message);
                     }
 
-                    updateSendProgress(i + 1, recipients.length);
-                    await delay(randomBetween(minDelay, maxDelay) * 1000);
+                    this.updateSendProgress(i + 1, recipients.length);
+                    await this.delay(this.randomBetween(minDelay, maxDelay) * 1000);
                 } catch (error) {
                     console.error(`Failed to send message to ${recipient}:`, error);
                 }
@@ -163,5 +186,30 @@ const ChatFunctions = {
         const progressElement = document.getElementById('sendProgress');
         progressElement.textContent = `Sending: ${current}/${total}`;
         progressElement.style.width = `${(current / total) * 100}%`;
+    },
+
+    getChatId: async function(input) {
+        if (input.endsWith('@g.us') || input.endsWith('@c.us')) {
+            return input;
+        }
+        // Remove any non-digit characters
+        const cleanNumber = input.replace(/\D/g, '');
+        return `${cleanNumber}@c.us`;
+    },
+
+    delay: function(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    },
+
+    randomBetween: function(min, max) {
+        return Math.random() * (max - min) + min;
+    },
+
+    createVCard: function(contactId, contactName) {
+        return `BEGIN:VCARD
+VERSION:3.0
+FN:${contactName}
+TEL;TYPE=CELL:${contactId}
+END:VCARD`;
     }
 };
