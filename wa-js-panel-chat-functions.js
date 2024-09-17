@@ -32,6 +32,7 @@ const ChatFunctions = {
         this.bindEvents();
     },
 
+
     addStyles: function() {
         const style = document.createElement('style');
         style.textContent = `
@@ -118,7 +119,7 @@ const ChatFunctions = {
                         const contactName = document.getElementById('contactName').value;
                         if (contactId && contactName) {
                             const vcard = this.createVCard(contactId, contactName);
-                            await WPP.chat.sendVCardMessage(chatId, vcard);
+                            await WPP.chat.sendVCardContact(chatId, vcard);
                         }
                     } else if (attachmentInput.files.length > 0) {
                         const file = attachmentInput.files[0];
@@ -133,7 +134,7 @@ const ChatFunctions = {
                                 await WPP.chat.sendFileMessage(chatId, file, { type: 'audio' });
                                 break;
                             case 'file':
-                                await WPP.chat.sendFileMessage(chatId, file);
+                                await WPP.chat.sendFileMessage(chatId, file, { type: 'document' });
                                 break;
                         }
                     }
@@ -194,7 +195,13 @@ const ChatFunctions = {
         }
         // Remove any non-digit characters
         const cleanNumber = input.replace(/\D/g, '');
-        return `${cleanNumber}@c.us`;
+        try {
+            const contact = await WPP.contact.queryExists(`${cleanNumber}@c.us`);
+            return contact.id._serialized;
+        } catch (error) {
+            console.error(`Failed to get chat ID for ${input}:`, error);
+            return `${cleanNumber}@c.us`;
+        }
     },
 
     delay: function(ms) {
