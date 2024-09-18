@@ -2,10 +2,24 @@
 (function(global) {
     const WA_JS_Panel = {
         init: function() {
-            this.addGlobalStyles();
-            this.createMainButton();
-            this.createPanel();
-            console.log('WA_JS_Panel initialized');
+            return new Promise((resolve, reject) => {
+                try {
+                    this.addGlobalStyles();
+                    this.createMainButton();
+                    this.createPanel();
+                    console.log('WA_JS_Panel initialized');
+                    // 使用 setTimeout 确保 DOM 已更新
+                    setTimeout(() => {
+                        if (document.getElementById('functionContainer')) {
+                            resolve();
+                        } else {
+                            reject(new Error('functionContainer not created'));
+                        }
+                    }, 0);
+                } catch (error) {
+                    reject(error);
+                }
+            });
         },
 
         addGlobalStyles: function() {
@@ -142,8 +156,9 @@
                 <div id="functionContainer"></div>
             `;
             document.body.appendChild(panel);
+            console.log('Panel appended to body');
             this.initializePanelFunctions();
-            console.log('Panel created');
+            console.log('Panel created and initialized');
         },
 
         initializePanelFunctions: function() {
