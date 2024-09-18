@@ -3,15 +3,15 @@
 // @namespace    http://tampermonkey.net/
 // @version      2.0
 // @description  Interactive panel for WA-JS functionality using wppconnect-wa.js
-// @author       Your Name
+// @author       Sigrid
 // @match        https://web.whatsapp.com/*
 // @icon         https://www.google.com/s2/favicons?domain=whatsapp.com
-// @require      https://github.com/wppconnect-team/wa-js/releases/download/nightly/wppconnect-wa.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/wa-js-panel-core.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/wa-js-panel-general-functions.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/wa-js-panel-chat-functions.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/wa-js-panel-contact-functions.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/wa-js-panel-group-functions.js
+// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wppconnect-wa.js
+// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-core.js
+// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-general-functions.js
+// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-chat-functions.js
+// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-contact-functions.js
+// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-group-functions.js
 
 // @grant        none
 // ==/UserScript==

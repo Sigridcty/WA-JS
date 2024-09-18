@@ -112,15 +112,7 @@
         togglePanel: function() {
             const panel = document.getElementById('wa-js-panel');
             if (panel) {
-                if (panel.style.display === 'none') {
-                    panel.style.display = 'block';
-                    // 每次显示面板时，都切换到聊天功能
-                    WA_JS_Panel.toggleSection('chatFunctions');
-                    document.querySelectorAll('.tabButton').forEach(btn => btn.classList.remove('active'));
-                    document.getElementById('chatTab').classList.add('active');
-                } else {
-                    panel.style.display = 'none';
-                }
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
             } else {
                 WA_JS_Panel.createPanel();
             }
