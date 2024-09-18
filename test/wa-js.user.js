@@ -6,12 +6,12 @@
 // @author       Sigrid
 // @match        https://web.whatsapp.com/*
 // @icon         https://www.google.com/s2/favicons?domain=whatsapp.com
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wppconnect-wa.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-core.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-general-functions.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-chat-functions.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-contact-functions.js
-// @require      https://raw.githubusercontent.com/Sigridcty/WA-JS/main/test/wa-js-panel-group-functions.js
+// @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wppconnect-wa.js
+// @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-core.js
+// @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-general-functions.js
+// @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-chat-functions.js
+// @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-contact-functions.js
+// @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-group-functions.js
 
 // @grant        none
 // ==/UserScript==
