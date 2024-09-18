@@ -905,7 +905,7 @@ const ChatFunctions = {
 
         // 清空输入框和附件
         //document.getElementById('recipientIds').value = '';
-        document.getElementById('messageContent').value = '';
+        //document.getElementById('messageContent').value = '';
         //document.getElementById('attachmentInput').value = '';
         this.updateAttachmentPreview(); // 清空附件预览
         
