@@ -4,6 +4,8 @@
         init: function() {
             this.addGlobalStyles();
             this.createMainButton();
+            this.createPanel();
+            console.log('WA_JS_Panel initialized');
         },
 
         addGlobalStyles: function() {
@@ -131,18 +133,17 @@
             panel.id = 'wa-js-panel';
             panel.innerHTML = `
                 <h3>WA-Sigrid</h3>
-                
                 <div id="tabButtons">
                     <button id="generalTab" class="tabButton">通用功能</button>
                     <button id="chatTab" class="tabButton">聊天功能</button>
                     <button id="contactTab" class="tabButton">联系人功能</button>
                     <button id="groupTab" class="tabButton">群组功能</button>
                 </div>
-
                 <div id="functionContainer"></div>
             `;
             document.body.appendChild(panel);
             this.initializePanelFunctions();
+            console.log('Panel created');
         },
 
         initializePanelFunctions: function() {
@@ -176,13 +177,18 @@
 
         addFunctionToPanel: function(moduleName, htmlContent) {
             const container = document.getElementById('functionContainer');
+            if (!container) {
+                console.error('functionContainer not found. Panel may not be initialized yet.');
+                return;
+            }
             const div = document.createElement('div');
             div.id = `${moduleName}Functions`;
             div.className = 'tabContent';
             div.style.display = 'none';
             div.innerHTML = htmlContent;
             container.appendChild(div);
-        }
+            console.log(`Added ${moduleName} function to panel`);
+        },
     };
 
     // Expose WA_JS_Panel to the global scope
