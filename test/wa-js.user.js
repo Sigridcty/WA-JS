@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WA-JS Interactive Panel
 // @namespace    http://tampermonkey.net/
-// @version      2.0.2
+// @version      2.0.4
 // @description  Interactive panel for WA-JS functionality using wppconnect-wa.js
 // @author       Sigrid
 // @match        https://web.whatsapp.com/*
