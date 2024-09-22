@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WA-JS Interactive Panel
 // @namespace    http://tampermonkey.net/
-// @version      2.0.5
+// @version      2.0.7
 // @description  Interactive panel for WA-JS functionality using wppconnect-wa.js
 // @author       Sigrid
 // @match        https://web.whatsapp.com/*
@@ -20,13 +20,30 @@
 (function() {
     'use strict';
 
-    // Wait for WhatsApp Web to fully load
-    window.addEventListener('load', function() {
-        // Wait for WPP to be ready
+    function initWhenReady() {
+        const targetNode = document.body;
+        const config = { childList: true, subtree: true };
+
+        const callback = function(mutationsList, observer) {
+            for(let mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    if (document.querySelector('#app')) {
+                        observer.disconnect();
+                        initializeScript();
+                        break;
+                    }
+                }
+            }
+        };
+
+        const observer = new MutationObserver(callback);
+        observer.observe(targetNode, config);
+    }
+
+    function initializeScript() {
         WPP.webpack.onReady(async function() {
             console.log('WPPConnect WA-JS is ready!');
 
-            // Check if all modules are loaded
             if (typeof WA_JS_Panel === 'undefined' ||
                 typeof GeneralFunctions === 'undefined' ||
                 typeof ChatFunctions === 'undefined' ||
@@ -36,14 +53,13 @@
                 return;
             }
 
-            // Initialize the panel
             WA_JS_Panel.init();
-
-            // Initialize all function modules
             GeneralFunctions.init();
             ChatFunctions.init();
             ContactFunctions.init();
             GroupFunctions.init();
         });
-    });
+    }
+
+    window.addEventListener('load', initWhenReady);
 })();
