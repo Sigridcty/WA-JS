@@ -12,38 +12,61 @@
 // @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-chat-functions.js
 // @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-contact-functions.js
 // @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-group-functions.js
+// @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-community-functions.js
 
 // @grant        none
 // ==/UserScript==
 
-/* globals WPP, WA_JS_Panel, GeneralFunctions, ChatFunctions, ContactFunctions, GroupFunctions */
+/* globals WPP, WA_JS_Panel, GeneralFunctions, ChatFunctions, ContactFunctions, GroupFunctions, CommunityFunctions */
 (function() {
     'use strict';
 
+    function waitForElement(selector) {
+        return new Promise(resolve => {
+            if (document.querySelector(selector)) {
+                return resolve(document.querySelector(selector));
+            }
+
+            const observer = new MutationObserver(mutations => {
+                if (document.querySelector(selector)) {
+                    resolve(document.querySelector(selector));
+                    observer.disconnect();
+                }
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+    }
+
+    function initializePanel() {
+        console.log('Initializing WA_JS_Panel...');
+        if (typeof WA_JS_Panel === 'undefined' ||
+            typeof GeneralFunctions === 'undefined' ||
+            typeof ChatFunctions === 'undefined' ||
+            typeof ContactFunctions === 'undefined' ||
+            typeof GroupFunctions === 'undefined' ||
+            typeof CommunityFunctions === 'undefined') {
+            console.error('One or more modules failed to load');
+            return;
+        }
+
+        WA_JS_Panel.init();
+        GeneralFunctions.init();
+        ChatFunctions.init();
+        ContactFunctions.init();
+        GroupFunctions.init();
+        CommunityFunctions.init();
+    }
+
     // Wait for WhatsApp Web to fully load
-    window.addEventListener('load', function() {
+    waitForElement('div[data-asset-intro-image-light]').then(() => {
         // Wait for WPP to be ready
         WPP.webpack.onReady(async function() {
             console.log('WPPConnect WA-JS is ready!');
-
-            // Check if all modules are loaded
-            if (typeof WA_JS_Panel === 'undefined' ||
-                typeof GeneralFunctions === 'undefined' ||
-                typeof ChatFunctions === 'undefined' ||
-                typeof ContactFunctions === 'undefined' ||
-                typeof GroupFunctions === 'undefined') {
-                console.error('One or more modules failed to load');
-                return;
-            }
-
-            // Initialize the panel
-            WA_JS_Panel.init();
-
-            // Initialize all function modules
-            GeneralFunctions.init();
-            ChatFunctions.init();
-            ContactFunctions.init();
-            GroupFunctions.init();
+            initializePanel();
         });
     });
 })();
