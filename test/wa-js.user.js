@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WA-JS Interactive Panel
 // @namespace    http://tampermonkey.net/
-// @version      2.1.5
+// @version      2.2.0
 // @description  Interactive panel for WA-JS functionality using wppconnect-wa.js
 // @author       Sigrid
 // @match        https://web.whatsapp.com/*
@@ -13,7 +13,6 @@
 // @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-contact-functions.js
 // @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-group-functions.js
 // @require      https://github.com/Sigridcty/WA-JS/releases/download/wa/wa-js-panel-community-functions.js
-
 // @grant        none
 // ==/UserScript==
 
@@ -61,12 +60,19 @@
         CommunityFunctions.init();
     }
 
+    function delayedInitialization() {
+        setTimeout(() => {
+            // Wait for WPP to be ready
+            WPP.webpack.onReady(async function() {
+                console.log('WPPConnect WA-JS is ready!');
+                initializePanel();
+            });
+        }, 5000); // 5秒延迟
+    }
+
     // Wait for WhatsApp Web to fully load
     waitForElement('div[data-asset-intro-image-light]').then(() => {
-        // Wait for WPP to be ready
-        WPP.webpack.onReady(async function() {
-            console.log('WPPConnect WA-JS is ready!');
-            initializePanel();
-        });
+        console.log('WhatsApp Web has loaded. Waiting 5 seconds before initializing...');
+        delayedInitialization();
     });
 })();
